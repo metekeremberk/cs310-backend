@@ -1,4 +1,4 @@
-package com.gymgyme.exercise.repository.best_exercise;
+package com.gymgyme.exercise.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

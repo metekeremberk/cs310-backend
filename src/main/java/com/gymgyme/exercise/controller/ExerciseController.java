@@ -1,12 +1,15 @@
 package com.gymgyme.exercise.controller;
 
 import java.util.List;
+import java.util.Set;
 
+import com.gymgyme.exercise.model.ApplicationUser;
+import com.gymgyme.exercise.model.WorkoutRoutine;
+import com.gymgyme.exercise.repository.WorkoutRoutineRepository;
+import com.gymgyme.exercise.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.*;
 
 import com.gymgyme.exercise.model.BestExercise;
 import com.gymgyme.exercise.model.Exercise;
@@ -15,7 +18,7 @@ import com.gymgyme.exercise.repository.ExerciseRepository;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/")
+@RequestMapping("/exercise")
 public class ExerciseController {
 
     @Autowired
@@ -24,7 +27,13 @@ public class ExerciseController {
     @Autowired
     BestExerciseRepository bestRepo;
 
-    @GetMapping(value="/exercises")
+    @Autowired
+    AuthenticationService authenticationService;
+
+    @Autowired
+    WorkoutRoutineRepository workoutRoutineRepo;
+
+    @GetMapping(value="/")
     public List<Exercise> getExercises() {
         return exerciseRepo.findAll();
     }
@@ -32,5 +41,24 @@ public class ExerciseController {
     @GetMapping(value="/best")
     public List<BestExercise> getBestExercises() {
         return bestRepo.findAll();
+    }
+
+    @GetMapping(value = "/workout")
+    public Set<Long> getMyWorkouts() {
+        ApplicationUser user = authenticationService.currentUser();
+
+        return user.getWorkoutRoutineIds();
+    }
+
+    @GetMapping(value = "/workout?name={name}")
+    public WorkoutRoutine createWorkoutRoutine(@PathVariable String name) {
+        WorkoutRoutine routine = new WorkoutRoutine(name);
+        System.out.println(routine);
+        workoutRoutineRepo.save(routine);
+        ApplicationUser user = authenticationService.currentUser();
+
+        user.addWorkoutRoutine(workoutRoutineRepo.findByName(routine.getName()).getId());
+
+        return routine;
     }
 }

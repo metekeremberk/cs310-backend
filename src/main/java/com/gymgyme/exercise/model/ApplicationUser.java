@@ -22,6 +22,9 @@ public class ApplicationUser implements UserDetails {
 
     private String password;
 
+    @Transient
+    private Set<Long> workoutRoutineIds;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role_junction",
@@ -33,6 +36,7 @@ public class ApplicationUser implements UserDetails {
     public ApplicationUser() {
         super();
         this.authorities = new HashSet<>();
+        this.workoutRoutineIds = new HashSet<>();
     }
 
     public ApplicationUser(Integer userId, String username, String password, Set<Role> authorities) {
@@ -41,6 +45,7 @@ public class ApplicationUser implements UserDetails {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.workoutRoutineIds = new HashSet<>();
     }
 
     @Override
@@ -59,6 +64,10 @@ public class ApplicationUser implements UserDetails {
     }
 
     public Integer getUserId() { return this.userId; }
+
+    public Set<Long> getWorkoutRoutineIds() { return workoutRoutineIds; }
+
+    public void setWorkoutRoutineIds(Set<Long> workoutRoutineIds) { this.workoutRoutineIds = workoutRoutineIds; }
 
     public void setUsername(String username) {
         this.username = username;
@@ -90,6 +99,10 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void addWorkoutRoutine(Long id) {
+        this.workoutRoutineIds.add(id);
     }
 
 }
